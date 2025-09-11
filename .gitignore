@@ -1,0 +1,31 @@
+# Build results
+bin/
+obj/
+out/
+
+# Visual Studio / Rider / VS Code
+.vscode/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Entity Framework / SQLite databases
+*.db
+*.db-shm
+*.db-wal
+
+# Secrets
+appsettings.Development.json
+appsettings.Local.json
+
+# Publish output
+publish/

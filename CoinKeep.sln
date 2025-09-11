@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoinKeep.Api", "CoinKeep.Api\CoinKeep.Api.csproj", "{253ACDDB-55C9-4510-A61E-CE2B879497A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoinKeep.Core", "CoinKeep.Core\CoinKeep.Core.csproj", "{767834F4-E51C-4C2F-8BE6-4ACBD6303DBC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoinKeep.Infrastructure", "CoinKeep.Infrastructure\CoinKeep.Infrastructure.csproj", "{2DF9B6B0-D118-4AA5-ACD7-28894620C0EB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{253ACDDB-55C9-4510-A61E-CE2B879497A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{253ACDDB-55C9-4510-A61E-CE2B879497A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{253ACDDB-55C9-4510-A61E-CE2B879497A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{253ACDDB-55C9-4510-A61E-CE2B879497A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{767834F4-E51C-4C2F-8BE6-4ACBD6303DBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{767834F4-E51C-4C2F-8BE6-4ACBD6303DBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{767834F4-E51C-4C2F-8BE6-4ACBD6303DBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{767834F4-E51C-4C2F-8BE6-4ACBD6303DBC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DF9B6B0-D118-4AA5-ACD7-28894620C0EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DF9B6B0-D118-4AA5-ACD7-28894620C0EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DF9B6B0-D118-4AA5-ACD7-28894620C0EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DF9B6B0-D118-4AA5-ACD7-28894620C0EB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
