@@ -17,7 +17,6 @@ namespace CoinKeep.Api.Controllers;
 [ApiController]
 [Route("[controller]")]
 public class UserController(AppDbContext db, IConfiguration config) : Controller {
-	//
 
 	[Authorize]
 	[HttpGet("getUsers")]
@@ -67,7 +66,6 @@ public class UserController(AppDbContext db, IConfiguration config) : Controller
 		var userToken = this.GenerateJwtToken(userFromDb);
 		return this.Ok(userToken);
 	}
-
 
 	private string GenerateJwtToken(User user) {
 		var claims = new[]

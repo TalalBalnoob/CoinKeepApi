@@ -15,15 +15,24 @@ namespace CoinKeep.Infrastructure {
 				new User {
 					Id = 1,
 					Username = "user1",
-					Password = hasher.HashPassword("admin", "user1user1"),
+					Email = "user1@user.com",
+					// Password = hasher.HashPassword("admin", "user1user1"),
+					Password = "AQAAAAIAAYagAAAAEM4cZmJc1kpoIQqEjLhJYlMv6+yUuOfjR+LJoPl+au+YQ==", // precomputed
+					CreatedAt = new DateTime(2025, 1, 1)
 				}, new User {
 					Id = 2,
 					Username = "user2",
-					Password = hasher.HashPassword("user2", "user2user2"),
+					Email = "user2@user.com",
+					// Password = hasher.HashPassword("user2", "user2user2"),
+					Password = "AQAAAAIAAYagAAAAEGD7ByIckeymf+kqAcPtLoqJ7Q9MmtLmDUwVJHhZsdWnY==",
+					CreatedAt = new DateTime(2025, 1, 1)
 				}, new User {
 					Id = 3,
 					Username = "user3",
-					Password = hasher.HashPassword("user3", "user3user3"),
+					Email = "user3@user.com",
+					// Password = hasher.HashPassword("user3", "user3user3"),
+					Password = "AQAAAAIAAYagAAAAEO9zkXe19S1v+T17mLRQUGqFc0R0Q==",
+					CreatedAt = new DateTime(2025, 1, 1)
 				}
 			);
 		}
