@@ -17,7 +17,7 @@ public class Category {
 	public int? UserId { get; set; }
 
 
-	[ForeignKey("User_id")]
+	[ForeignKey("UserId")]
 	public User? User { get; set; }
 
 }
