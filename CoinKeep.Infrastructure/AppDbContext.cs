@@ -8,32 +8,32 @@ namespace CoinKeep.Infrastructure {
 
 		public DbSet<User> Users { get; set; }
 		public DbSet<Category> Categories { get; set; }
+		public DbSet<Transaction> Transactions { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder) {
 			base.OnModelCreating(modelBuilder);
-			var hasher = new PasswordHasher<string>();
 
 			modelBuilder.Entity<User>().HasData(
 				new User {
 					Id = 1,
 					Username = "user1",
 					Email = "user1@user.com",
-					// Password = hasher.HashPassword("admin", "user1user1"),
-					Password = "AQAAAAIAAYagAAAAEM4cZmJc1kpoIQqEjLhJYlMv6+yUuOfjR+LJoPl+au+YQ==", // precomputed
+					// Password = hasher.HashPassword("user1", "user1user1"),
+					Password = "AQAAAAIAAYagAAAAEBWS00dIwzm6aum6zfyyxPsavjBxHL4bH+WALNgFmTtJTu6hlIINddyY2+bJN2n6pg==", // precomputed
 					CreatedAt = new DateTime(2025, 1, 1)
 				}, new User {
 					Id = 2,
 					Username = "user2",
 					Email = "user2@user.com",
 					// Password = hasher.HashPassword("user2", "user2user2"),
-					Password = "AQAAAAIAAYagAAAAEGD7ByIckeymf+kqAcPtLoqJ7Q9MmtLmDUwVJHhZsdWnY==",
+					Password = "AQAAAAIAAYagAAAAED/hSj4vRPNwMlSSpSqSdf5JsMYUe4hNXVgSjIsq8KHfvnB8lUUYs9Ujei9bKSdIkQ==",
 					CreatedAt = new DateTime(2025, 1, 1)
 				}, new User {
 					Id = 3,
 					Username = "user3",
 					Email = "user3@user.com",
 					// Password = hasher.HashPassword("user3", "user3user3"),
-					Password = "AQAAAAIAAYagAAAAEO9zkXe19S1v+T17mLRQUGqFc0R0Q==",
+					Password = "AQAAAAIAAYagAAAAEE2Vx1XhcxppJObpFP2V+sm3WzE8LiX3BhF78UyKFwiK20xTn2n7jx2U9T8hnZFr+Q==",
 					CreatedAt = new DateTime(2025, 1, 1)
 				}
 			);

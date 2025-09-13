@@ -17,6 +17,94 @@ namespace CoinKeep.Infrastructure.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.8");
 
+            modelBuilder.Entity("CoinKeep.Core.Models.Category", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("User_id")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("User_id");
+
+                    b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Salary",
+                            Type = 0
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Freelance",
+                            Type = 0
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Interest",
+                            Type = 0
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Groceries",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "Rent",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "Utilities",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Name = "Entertainment",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Name = "Transport",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Name = "Investment",
+                            Type = 0
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Name = "Health",
+                            Type = 1
+                        });
+                });
+
             modelBuilder.Entity("CoinKeep.Core.Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -50,7 +138,7 @@ namespace CoinKeep.Infrastructure.Migrations
                             Id = 1,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "user1@user.com",
-                            Password = "AQAAAAIAAYagAAAAEM4cZmJc1kpoIQqEjLhJYlMv6+yUuOfjR+LJoPl+au+YQ==",
+                            Password = "AQAAAAIAAYagAAAAEBWS00dIwzm6aum6zfyyxPsavjBxHL4bH+WALNgFmTtJTu6hlIINddyY2+bJN2n6pg==",
                             Username = "user1"
                         },
                         new
@@ -58,7 +146,7 @@ namespace CoinKeep.Infrastructure.Migrations
                             Id = 2,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "user2@user.com",
-                            Password = "AQAAAAIAAYagAAAAEGD7ByIckeymf+kqAcPtLoqJ7Q9MmtLmDUwVJHhZsdWnY==",
+                            Password = "AQAAAAIAAYagAAAAED/hSj4vRPNwMlSSpSqSdf5JsMYUe4hNXVgSjIsq8KHfvnB8lUUYs9Ujei9bKSdIkQ==",
                             Username = "user2"
                         },
                         new
@@ -66,9 +154,18 @@ namespace CoinKeep.Infrastructure.Migrations
                             Id = 3,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "user3@user.com",
-                            Password = "AQAAAAIAAYagAAAAEO9zkXe19S1v+T17mLRQUGqFc0R0Q==",
+                            Password = "AQAAAAIAAYagAAAAEE2Vx1XhcxppJObpFP2V+sm3WzE8LiX3BhF78UyKFwiK20xTn2n7jx2U9T8hnZFr+Q==",
                             Username = "user3"
                         });
+                });
+
+            modelBuilder.Entity("CoinKeep.Core.Models.Category", b =>
+                {
+                    b.HasOne("CoinKeep.Core.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("User_id");
+
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }
