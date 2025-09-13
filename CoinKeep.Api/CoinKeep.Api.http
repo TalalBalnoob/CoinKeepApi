@@ -1,6 +1,30 @@
-@CoinKeep.Api_HostAddress = http://localhost:5070
+@hostname = http://localhost
+@port = 5070
+@host = {{hostname}}:{{port}}
+@contentType = application/json
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzYW1wbGUiLCJlbWFpbCI6InRrbGRAZ21hbHMuY29tIiwianRpIjoiMjE0MTM4YjQtYTZlNS00MmMyLThkMDItMWUzNjY1M2M2Y2M5IiwiZXhwIjoxNzU3NzMwMTA2LCJpc3MiOiJDb2luS2VlcEFwaSIsImF1ZCI6IkNvaW5LZWVwVXNlcnMifQ.-KZdBkszG6pMPTQm7RgxF4ogxY8tzWd0JKHdP952_A8
+@Authorization = Bearer {{token}}
 
-GET {{CoinKeep.Api_HostAddress}}/weatherforecast/
-Accept: application/json
+POST {{host}}/User/register HTTP/1.1
+content-type: {{contentType}}
+
+{
+    "username": "sample",
+	"email" : "tkld@gmals.com",
+    "password": "gooodoasdasd"
+}
 
 ###
+POST {{host}}/User/login HTTP/1.1
+content-type: {{contentType}}
+
+{
+    "username": "sample",
+    "password": "gooodoasdasd"
+}
+
+###
+GET {{host}}/User/getUsers HTTP/1.1
+content-type: {{contentType}}
+Authorization: {{Authorization}}
+

@@ -1,30 +1,96 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+
 using CoinKeep.Core.DTOs;
 using CoinKeep.Core.Models;
 using CoinKeep.Infrastructure;
 
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace CoinKeep.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class UserController : Controller {
-	private readonly AppDbContext _db;
+public class UserController(AppDbContext db, IConfiguration config) : Controller {
+	//
 
-	public UserController(AppDbContext db) {
-		_db = db;
-	}
-
-	[HttpGet("profile")]
-	public IActionResult getUser() {
-		var users = _db.Users.Select(u => new UserProfileDto {
+	[Authorize]
+	[HttpGet("getUsers")]
+	public IActionResult GetUser() {
+		var users = db.Users.Select(u => new UserProfileDto {
 			Id = u.Id,
 			Email = u.Email,
 			Username = u.Username
 		});
 
-		return Ok(users);
+		return this.Ok(users);
 	}
 
+	[HttpPost("register")]
+	public IActionResult SingUp(User user) {
+		User? isExist = db.Users.FirstOrDefault(u => user.Email == user.Email || u.Username == user.Username);
+		if (isExist != null) return this.BadRequest("User with that email/username already exists");
+
+		var hasher = new PasswordHasher<string>();
+
+		var newUser = new User {
+			Email = user.Email,
+			Username = user.Username,
+			Password = hasher.HashPassword(user.Username, user.Password),
+			Id = 0,
+			CreatedAt = DateTime.UtcNow
+		};
+
+		db.Users.Add(newUser);
+		db.SaveChanges();
+		return this.Ok(new UserProfileDto {
+			Id = newUser.Id,
+			Username = newUser.Username,
+			Email = newUser.Email,
+		});
+	}
+
+	[HttpPost("login")]
+	public IActionResult Login(LoginUserDto loginInfo) {
+		User? userFromDb = db.Users.FirstOrDefault(u => u.Username == loginInfo.username);
+		if (userFromDb == null) return this.NotFound();
+		var hasher = new PasswordHasher<string>();
+
+		var isValidPassword = hasher.VerifyHashedPassword(userFromDb.Username, userFromDb.Password, loginInfo.password);
+		if (isValidPassword != PasswordVerificationResult.Success) return this.Unauthorized();
+
+		var userToken = this.GenerateJwtToken(userFromDb);
+		return this.Ok(userToken);
+	}
+
+
+	private string GenerateJwtToken(User user) {
+		var claims = new[]
+		{
+			new Claim(JwtRegisteredClaimNames.Sub, user.Username),
+			new Claim(JwtRegisteredClaimNames.Email, user.Email),
+			new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+		};
+
+		var key = new SymmetricSecurityKey(
+			Encoding.UTF8.GetBytes(config["Jwt:Key"]!)
+		);
+		var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+		var token = new JwtSecurityToken(
+			issuer: config["Jwt:Issuer"],
+			audience: config["Jwt:Audience"],
+			claims: claims,
+			expires: DateTime.UtcNow.AddHours(8),
+			signingCredentials: creds
+		);
+
+		return new JwtSecurityTokenHandler().WriteToken(token);
+	}
 }
+

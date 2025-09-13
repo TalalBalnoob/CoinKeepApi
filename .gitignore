@@ -30,5 +30,4 @@ appsettings.Local.json
 # Publish output
 publish/
 
-
 *.http
