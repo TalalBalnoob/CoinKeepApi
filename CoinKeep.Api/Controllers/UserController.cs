@@ -70,9 +70,9 @@ public class UserController(AppDbContext db, IConfiguration config) : Controller
 	private string GenerateJwtToken(User user) {
 		var claims = new[]
 		{
-			new Claim(JwtRegisteredClaimNames.Sub, user.Username),
-			new Claim(JwtRegisteredClaimNames.Email, user.Email),
-			new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+			new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+			new Claim(ClaimTypes.Name, user.Username),
+			new Claim(ClaimTypes.Email, user.Email),
 		};
 
 		var key = new SymmetricSecurityKey(
