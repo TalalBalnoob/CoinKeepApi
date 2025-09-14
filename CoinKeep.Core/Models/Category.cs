@@ -20,4 +20,6 @@ public class Category {
 	[ForeignKey("UserId")]
 	public User? User { get; set; }
 
+	public ICollection<Transaction> Transactions { get; set; }
+
 }

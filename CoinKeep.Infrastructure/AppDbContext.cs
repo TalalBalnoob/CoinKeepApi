@@ -13,6 +13,12 @@ namespace CoinKeep.Infrastructure {
 		protected override void OnModelCreating(ModelBuilder modelBuilder) {
 			base.OnModelCreating(modelBuilder);
 
+			modelBuilder.Entity<Transaction>()
+			   .HasOne(t => t.Category)
+			   .WithMany(c => c.Transactions)
+			   .HasForeignKey(t => t.CategoryId)
+			   .OnDelete(DeleteBehavior.SetNull);
+
 			modelBuilder.Entity<User>().HasData(
 				new User {
 					Id = 1,
