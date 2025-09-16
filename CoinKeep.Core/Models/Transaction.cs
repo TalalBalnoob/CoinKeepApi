@@ -15,7 +15,7 @@ public class Transaction {
 
 	public string? Note { get; set; }
 
-	public int CategoryId { get; set; }
+	public int? CategoryId { get; set; }
 
 
 	[ForeignKey("CategoryId")]

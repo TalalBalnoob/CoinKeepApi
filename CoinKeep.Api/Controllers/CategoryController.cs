@@ -7,6 +7,7 @@ using CoinKeep.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CoinKeep.Api.Controllers {
 	[Authorize]
@@ -27,8 +28,8 @@ namespace CoinKeep.Api.Controllers {
 			if (userIdClaim == null) return Unauthorized();
 			var userId = int.Parse(userIdClaim.Value);
 
-			var category = db.Categories.Find(id);
-			if (category == null || category.UserId == userId) return Unauthorized();
+			var category = db.Categories.Include(c => c.Transactions).FirstOrDefault(c => id == c.Id);
+			if (category == null || category.UserId != userId) return NotFound();
 
 			var transactions = category.Transactions.ToList();
 
@@ -66,8 +67,8 @@ namespace CoinKeep.Api.Controllers {
 			var categoryFromDb = db.Categories.Find(id);
 			if (categoryFromDb == null) return NotFound();
 
-			var isNameExist = db.Categories.First(c => c.Name.ToLower() == categoryDto.Name.ToLower() && c.Id != categoryFromDb.Id);
-			if (isNameExist != null) return Conflict();
+			var isNameExist = db.Categories.Any(c => c.Name.ToLower() == categoryDto.Name.ToLower() && c.Id != categoryFromDb.Id);
+			if (isNameExist) return Conflict();
 
 			categoryFromDb.Name = categoryDto.Name;
 			categoryFromDb.Type = categoryFromDb.Type;

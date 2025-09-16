@@ -25,7 +25,7 @@ namespace CoinKeep.Api.Controllers {
 			return Ok(transactions);
 		}
 
-		[HttpGet("/{id}")]
+		[HttpGet("{id}")]
 		public IActionResult GetTransaction(int id) {
 			var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
 			if (userIdClaim == null)
@@ -49,7 +49,7 @@ namespace CoinKeep.Api.Controllers {
 			int userId = int.Parse(userIdClaim.Value);
 
 			var isCategoryExist = db.Categories.Any(c => c.Id == transactionDto.CategoryId && (c.UserId == userId || c.UserId == null));
-			if (isCategoryExist) return NotFound("Category dose not exist");
+			if (!isCategoryExist) return NotFound("Category dose not exist");
 
 			var newTransaction = new Transaction {
 				Id = 0,
@@ -68,7 +68,7 @@ namespace CoinKeep.Api.Controllers {
 		}
 
 
-		[HttpPut("/{id}")]
+		[HttpPut("{id}")]
 		public IActionResult UpdateTransaction(int id, [FromBody] TransactionDto transactionDto) {
 			var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
 			if (userIdClaim == null)
@@ -79,7 +79,7 @@ namespace CoinKeep.Api.Controllers {
 			if (transactionFromDB == null || transactionFromDB.UserId != userId) return NotFound("Transaction Not Found");
 
 			var isCategoryExist = db.Categories.Any(c => c.Id == transactionDto.CategoryId && (c.UserId == userId || c.UserId == null));
-			if (isCategoryExist) return NotFound("Category dose not exist");
+			if (!isCategoryExist) return NotFound("Category dose not exist");
 
 			transactionFromDB.Amount = transactionDto.Amount;
 			transactionFromDB.Note = transactionDto.Note;
@@ -90,7 +90,7 @@ namespace CoinKeep.Api.Controllers {
 			return NoContent();
 		}
 
-		[HttpDelete("/{id}")]
+		[HttpDelete("{id}")]
 		public IActionResult DeleteTransaction(int id) {
 			var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
 			if (userIdClaim == null)
