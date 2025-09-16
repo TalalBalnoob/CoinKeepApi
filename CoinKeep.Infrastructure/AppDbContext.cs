@@ -45,16 +45,17 @@ namespace CoinKeep.Infrastructure {
 			);
 
 			modelBuilder.Entity<Category>().HasData(
+				new Category { Id = 0, UserId = null, Name = "Balance Adjustment", Type = CategoryType.Adjustment },
 				new Category { Id = 1, UserId = null, Name = "Salary", Type = CategoryType.Income },
 				new Category { Id = 2, UserId = null, Name = "Freelance", Type = CategoryType.Income },
 				new Category { Id = 3, UserId = null, Name = "Interest", Type = CategoryType.Income },
-				new Category { Id = 4, UserId = null, Name = "Groceries", Type = CategoryType.Outcome },
-				new Category { Id = 5, UserId = null, Name = "Rent", Type = CategoryType.Outcome },
-				new Category { Id = 6, UserId = null, Name = "Utilities", Type = CategoryType.Outcome },
-				new Category { Id = 7, UserId = null, Name = "Entertainment", Type = CategoryType.Outcome },
-				new Category { Id = 8, UserId = null, Name = "Transport", Type = CategoryType.Outcome },
+				new Category { Id = 4, UserId = null, Name = "Groceries", Type = CategoryType.Expense },
+				new Category { Id = 5, UserId = null, Name = "Rent", Type = CategoryType.Expense },
+				new Category { Id = 6, UserId = null, Name = "Utilities", Type = CategoryType.Expense },
+				new Category { Id = 7, UserId = null, Name = "Entertainment", Type = CategoryType.Expense },
+				new Category { Id = 8, UserId = null, Name = "Transport", Type = CategoryType.Expense },
 				new Category { Id = 9, UserId = null, Name = "Investment", Type = CategoryType.Income },
-				new Category { Id = 10, UserId = null, Name = "Health", Type = CategoryType.Outcome }
+				new Category { Id = 10, UserId = null, Name = "Health", Type = CategoryType.Expense }
 			);
 		}
 	}

@@ -2,6 +2,7 @@ using System.Security.Claims;
 
 using CoinKeep.Core.DTOs;
 using CoinKeep.Core.Models;
+using CoinKeep.Core.Statics;
 using CoinKeep.Infrastructure;
 
 using Microsoft.AspNetCore.Authorization;
@@ -17,7 +18,7 @@ namespace CoinKeep.Api.Controllers {
 
 		[HttpGet]
 		public IActionResult getAllCategories() {
-			var categories = db.Categories.ToList();
+			var categories = db.Categories.Where(c => c.Type == CategoryType.Expense || c.Type == CategoryType.Income).ToList();
 
 			return this.Ok(categories);
 		}

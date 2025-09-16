@@ -3,22 +3,23 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CoinKeep.Core.Models;
 
-public class User
-{
-    [Key]
-    public int Id { get; set; }
+public class User {
+	[Key]
+	public int Id { get; set; }
 
-    [Required]
-    [MaxLength(100)]
-    public string Username { get; set; } = string.Empty;
+	[Required]
+	[MaxLength(100)]
+	public string Username { get; set; } = string.Empty;
 
-    [Required]
-    [MaxLength(255)]
-    [EmailAddress]
-    public string Email { get; set; } = string.Empty;
+	[Required]
+	[MaxLength(255)]
+	[EmailAddress]
+	public string Email { get; set; } = string.Empty;
 
-    [Required]
-    public string Password { get; set; } = string.Empty;
+	[Required]
+	public string Password { get; set; } = string.Empty;
 
-    public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+	public decimal Balance { get; set; }
+
+	public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
 }
