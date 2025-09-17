@@ -21,11 +21,11 @@ public class Transaction {
 	[ForeignKey("CategoryId")]
 	public Category? Category { get; set; }
 
-	public int UserId { get; set; }
+	public int AccountId { get; set; }
 
 
-	[ForeignKey("UserId")]
-	public User? User { get; set; }
+	[ForeignKey("AccountId")]
+	public Account? Account { get; set; }
 
 	public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
 

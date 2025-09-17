@@ -1,5 +1,6 @@
 using System.Security.Claims;
 
+using CoinKeep.Api.Extensions;
 using CoinKeep.Core.DTOs;
 using CoinKeep.Core.Models;
 using CoinKeep.Infrastructure;
@@ -12,30 +13,28 @@ namespace CoinKeep.Api.Controllers {
 	[Route("[controller]")]
 	[ApiController]
 	public class TransactionController(ILogger<TransactionController> logger, AppDbContext db) : ControllerBase {
-		[HttpGet]
-		public IActionResult GetAllTransactions() {
-			var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-			if (userIdClaim == null)
-				return Unauthorized();
+		[HttpGet("{accountId}")]
+		public IActionResult GetAllTransactions(int accountId) {
+			var userId = User.GetUserId();
 
-			int userId = int.Parse(userIdClaim.Value);
+			var isAccountExist = db.Accounts.Any(a => a.Id == accountId && a.UserId == userId);
+			if (!isAccountExist) return NotFound("Account dose not exist");
 
-			var transactions = db.Transactions.Where(u => u.UserId == userId).ToList();
+			var transactions = db.Transactions.Where(u => u.AccountId == accountId).ToList();
 
 			return Ok(transactions);
 		}
 
-		[HttpGet("{id}")]
-		public IActionResult GetTransaction(int id) {
-			var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-			if (userIdClaim == null)
-				return Unauthorized();
+		[HttpGet("{accountId}/{id}")]
+		public IActionResult GetTransaction(int accountId, int id) {
+			var userId = User.GetUserId();
 
-			int userId = int.Parse(userIdClaim.Value);
+			var isAccountExist = db.Accounts.Any(a => a.Id == accountId && a.UserId == userId);
+			if (!isAccountExist) return NotFound("Account dose not exist");
 
 			var transaction = db.Transactions.FirstOrDefault(u => u.Id == id);
 
-			if (transaction == null || transaction.UserId != userId)
+			if (transaction == null || transaction.AccountId != accountId)
 				return NotFound();
 
 			return Ok(transaction);
@@ -43,10 +42,7 @@ namespace CoinKeep.Api.Controllers {
 
 		[HttpPost]
 		public IActionResult CreateTransaction([FromBody] TransactionDto transactionDto) {
-			var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-			if (userIdClaim == null)
-				return Unauthorized();
-			int userId = int.Parse(userIdClaim.Value);
+			var userId = User.GetUserId();
 
 			var isCategoryExist = db.Categories.Any(c => c.Id == transactionDto.CategoryId && (c.UserId == userId || c.UserId == null));
 			if (!isCategoryExist) return NotFound("Category dose not exist");
@@ -56,7 +52,7 @@ namespace CoinKeep.Api.Controllers {
 				Note = transactionDto.Note ?? "",
 				Amount = transactionDto.Amount,
 				CategoryId = transactionDto.CategoryId,
-				UserId = userId,
+				AccountId = transactionDto.accountId,
 				CreatedAt = DateTime.UtcNow
 			};
 
@@ -68,15 +64,14 @@ namespace CoinKeep.Api.Controllers {
 		}
 
 
-		[HttpPut("{id}")]
-		public IActionResult UpdateTransaction(int id, [FromBody] TransactionDto transactionDto) {
-			var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-			if (userIdClaim == null)
-				return Unauthorized();
-			int userId = int.Parse(userIdClaim.Value);
+		[HttpPut("{accountId}/{id}")]
+		public IActionResult UpdateTransaction(int accountId, int id, [FromBody] TransactionDto transactionDto) {
+			var userId = User.GetUserId();
+			var isAccountExist = db.Accounts.Any(a => a.Id == accountId && a.UserId == userId);
+			if (!isAccountExist) return NotFound("Account dose not exist");
 
 			var transactionFromDB = db.Transactions.Find(id);
-			if (transactionFromDB == null || transactionFromDB.UserId != userId) return NotFound("Transaction Not Found");
+			if (transactionFromDB == null || transactionFromDB.AccountId != accountId) return NotFound("Transaction Not Found");
 
 			var isCategoryExist = db.Categories.Any(c => c.Id == transactionDto.CategoryId && (c.UserId == userId || c.UserId == null));
 			if (!isCategoryExist) return NotFound("Category dose not exist");
@@ -90,15 +85,14 @@ namespace CoinKeep.Api.Controllers {
 			return NoContent();
 		}
 
-		[HttpDelete("{id}")]
-		public IActionResult DeleteTransaction(int id) {
-			var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-			if (userIdClaim == null)
-				return Unauthorized();
-			int userId = int.Parse(userIdClaim.Value);
+		[HttpDelete("{accountId}/{id}")]
+		public IActionResult DeleteTransaction(int accountId, int id) {
+			var userId = User.GetUserId();
+			var isAccountExist = db.Accounts.Any(a => a.Id == accountId && a.UserId == userId);
+			if (!isAccountExist) return NotFound("Account dose not exist");
 
 			var transactionFromDB = db.Transactions.Find(id);
-			if (transactionFromDB == null || transactionFromDB.UserId != userId) return NotFound("Transaction Not Found");
+			if (transactionFromDB == null || transactionFromDB.AccountId != accountId) return NotFound("Transaction Not Found");
 
 			db.Transactions.Remove(transactionFromDB);
 			logger.LogInformation("transaction {} has been deleted", id);

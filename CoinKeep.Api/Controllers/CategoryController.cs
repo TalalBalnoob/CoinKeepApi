@@ -1,5 +1,6 @@
 using System.Security.Claims;
 
+using CoinKeep.Api.Extensions;
 using CoinKeep.Core.DTOs;
 using CoinKeep.Core.Models;
 using CoinKeep.Core.Statics;
@@ -25,9 +26,7 @@ namespace CoinKeep.Api.Controllers {
 
 		[HttpGet("{id}/transactions")]
 		public IActionResult getRelatedTransactions(int id) {
-			var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-			if (userIdClaim == null) return Unauthorized();
-			var userId = int.Parse(userIdClaim.Value);
+			var userId = User.GetUserId();
 
 			var category = db.Categories.Include(c => c.Transactions).FirstOrDefault(c => id == c.Id);
 			if (category == null || category.UserId != userId) return NotFound();
@@ -39,9 +38,7 @@ namespace CoinKeep.Api.Controllers {
 
 		[HttpPost]
 		public IActionResult AddCategory(CategoryDto categoryDto) {
-			var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-			if (userIdClaim == null) return Unauthorized();
-			var userId = int.Parse(userIdClaim.Value);
+			var userId = User.GetUserId();
 
 			var isExist = db.Categories.Any(c => c.Name.ToLower() == categoryDto.Name.ToLower());
 			if (isExist) return Conflict();
@@ -61,9 +58,7 @@ namespace CoinKeep.Api.Controllers {
 
 		[HttpPut("{id}")]
 		public IActionResult UpdateCategory(int id, [FromBody] CategoryDto categoryDto) {
-			var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-			if (userIdClaim == null) return Unauthorized();
-			var userId = int.Parse(userIdClaim.Value);
+			var userId = User.GetUserId();
 
 			var categoryFromDb = db.Categories.Find(id);
 			if (categoryFromDb == null) return NotFound();
@@ -80,9 +75,7 @@ namespace CoinKeep.Api.Controllers {
 
 		[HttpDelete("{id}")]
 		public IActionResult DeleteCategory(int id) {
-			var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-			if (userIdClaim == null) return Unauthorized();
-			var userId = int.Parse(userIdClaim.Value);
+			var userId = User.GetUserId();
 
 			var categoryFromDb = db.Categories.First(c => c.Id == id && c.UserId == userId);
 			if (categoryFromDb == null) return NotFound();

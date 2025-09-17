@@ -19,7 +19,7 @@ public class User {
 	[Required]
 	public string Password { get; set; } = string.Empty;
 
-	public decimal Balance { get; set; }
+	public Account Account { get; set; }
 
 	public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
 }

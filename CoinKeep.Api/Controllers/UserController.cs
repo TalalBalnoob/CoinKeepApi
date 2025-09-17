@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
+using CoinKeep.Api.Extensions;
 using CoinKeep.Core.DTOs;
 using CoinKeep.Core.Models;
 using CoinKeep.Infrastructure;
@@ -31,29 +32,30 @@ public class UserController(AppDbContext db, IConfiguration config) : Controller
 	}
 
 	[Authorize]
-	[HttpPatch("balanceAdjustment")]
-	public IActionResult BalanceAdjustment([FromBody] decimal amount) {
-		var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-		if (userIdClaim == null) return Unauthorized();
-		var userId = int.Parse(userIdClaim.Value);
+	[HttpPatch("{accountId}/balanceAdjustment")]
+	public IActionResult BalanceAdjustment(int accountId, [FromBody] decimal amount) {
+		var userId = User.GetUserId();
+		var account = db.Accounts.FirstOrDefault(a => a.Id == accountId && a.UserId == userId);
+		if (account == null) return NotFound("Account dose not exist");
 
 		var userFromDb = db.Users.Find(userId);
 		if (userFromDb == null) return NotFound();
 
-		userFromDb.Balance = amount;
+		account.Balance = amount;
+
 		db.Transactions.Add(new Transaction {
-			Amount = amount - userFromDb.Balance,
+			Amount = amount - account.Balance,
 			CategoryId = 0, // Balance Adjustment Category
 			Note = "Balance Adjustment",
 			Id = 0,
-			UserId = userId,
+			AccountId = accountId,
 			CreatedAt = DateTime.UtcNow,
 		});
 
-		db.Users.Update(userFromDb);
+		db.Accounts.Update(account);
 		db.SaveChanges();
 
-		return this.Ok(new { newBalance = userFromDb.Balance });
+		return this.Ok(new { newBalance = account.Balance });
 
 	}
 
