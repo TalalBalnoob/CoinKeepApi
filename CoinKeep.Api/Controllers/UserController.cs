@@ -30,6 +30,33 @@ public class UserController(AppDbContext db, IConfiguration config) : Controller
 		return this.Ok(users);
 	}
 
+	[Authorize]
+	[HttpPatch("balanceAdjustment")]
+	public IActionResult BalanceAdjustment([FromBody] decimal amount) {
+		var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+		if (userIdClaim == null) return Unauthorized();
+		var userId = int.Parse(userIdClaim.Value);
+
+		var userFromDb = db.Users.Find(userId);
+		if (userFromDb == null) return NotFound();
+
+		userFromDb.Balance = amount;
+		db.Transactions.Add(new Transaction {
+			Amount = amount - userFromDb.Balance,
+			CategoryId = 0, // Balance Adjustment Category
+			Note = "Balance Adjustment",
+			Id = 0,
+			UserId = userId,
+			CreatedAt = DateTime.UtcNow,
+		});
+
+		db.Users.Update(userFromDb);
+		db.SaveChanges();
+
+		return this.Ok(new { newBalance = userFromDb.Balance });
+
+	}
+
 	[HttpPost("register")]
 	public IActionResult SingUp(User user) {
 		User? isExist = db.Users.FirstOrDefault(u => user.Email == user.Email || u.Username == user.Username);
