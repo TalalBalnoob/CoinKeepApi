@@ -67,7 +67,6 @@ namespace CoinKeep.Api.Controllers {
 			if (isNameExist) return Conflict();
 
 			categoryFromDb.Name = categoryDto.Name;
-			categoryFromDb.Type = categoryFromDb.Type;
 
 			db.SaveChanges();
 			return Ok();

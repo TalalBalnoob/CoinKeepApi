@@ -10,7 +10,6 @@ using CoinKeep.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace CoinKeep.Api.Controllers;
@@ -45,7 +44,7 @@ public class UserController(AppDbContext db, IConfiguration config) : Controller
 
 		db.Transactions.Add(new Transaction {
 			Amount = amount - account.Balance,
-			CategoryId = 0, // Balance Adjustment Category
+			CategoryId = 1, // Balance Adjustment Category
 			Note = "Balance Adjustment",
 			Id = 0,
 			AccountId = accountId,
