@@ -60,18 +60,24 @@ public class UserController(AppDbContext db, IConfiguration config) : Controller
 	}
 
 	[HttpPost("register")]
-	public IActionResult SingUp(User user) {
-		User? isExist = db.Users.FirstOrDefault(u => user.Email == user.Email || u.Username == user.Username);
+	public IActionResult SingUp(NewUserDto userDto) {
+		User? isExist = db.Users.FirstOrDefault(u => userDto.Email == userDto.Email || u.Username == userDto.Username);
 		if (isExist != null) return this.BadRequest("User with that email/username already exists");
 
 		var hasher = new PasswordHasher<string>();
 
 		var newUser = new User {
-			Email = user.Email,
-			Username = user.Username,
-			Password = hasher.HashPassword(user.Username, user.Password),
+			Email = userDto.Email,
+			Username = userDto.Username,
+			Password = hasher.HashPassword(userDto.Username, userDto.Password),
 			Id = 0,
-			CreatedAt = DateTime.UtcNow
+			CreatedAt = DateTime.UtcNow,
+			Account = new Account {
+				Id = 0,
+				Name = "Cash",
+				CreatedAt = DateTime.UtcNow,
+				Balance = userDto.initialBalance,
+			}
 		};
 
 		db.Users.Add(newUser);
