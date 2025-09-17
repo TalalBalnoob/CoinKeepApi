@@ -3,10 +3,12 @@ using System.Security.Claims;
 using CoinKeep.Api.Extensions;
 using CoinKeep.Core.DTOs;
 using CoinKeep.Core.Models;
+using CoinKeep.Core.Statics;
 using CoinKeep.Infrastructure;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CoinKeep.Api.Controllers {
 	[Authorize]
@@ -45,21 +47,27 @@ namespace CoinKeep.Api.Controllers {
 			var userId = User.GetUserId();
 
 			var accountFromDb = db.Accounts.FirstOrDefault(a => a.Id == accountId && a.UserId == userId);
-			if (accountFromDb != null) return NotFound("Account dose not exist");
+			if (accountFromDb == null) return NotFound("Account dose not exist");
 
-			var isCategoryExist = db.Categories.Any(c => c.Id == transactionDto.CategoryId && (c.UserId == userId || c.UserId == null));
-			if (!isCategoryExist) return NotFound("Category dose not exist");
+			var categoryFromDb = db.Categories.FirstOrDefault(c => c.Id == transactionDto.CategoryId && (c.UserId == userId || c.UserId == null));
+			if (categoryFromDb == null) return NotFound("Category dose not exist");
 
 			var newTransaction = new Transaction {
 				Id = 0,
 				Note = transactionDto.Note ?? "",
 				Amount = transactionDto.Amount,
-				CategoryId = transactionDto.CategoryId,
+				CategoryId = categoryFromDb.Id,
+				Category = categoryFromDb,
 				AccountId = accountId,
+				Account = accountFromDb,
 				CreatedAt = DateTime.UtcNow
 			};
 
-			accountFromDb.Balance += transactionDto.Amount;
+			if (categoryFromDb.Type == Core.Statics.CategoryType.Expense)
+				accountFromDb.Balance -= transactionDto.Amount;
+			else
+				accountFromDb.Balance += transactionDto.Amount;
+
 
 			db.Transactions.Add(newTransaction);
 			logger.LogInformation("New Transaction Has been created");
@@ -73,17 +81,26 @@ namespace CoinKeep.Api.Controllers {
 		public IActionResult UpdateTransaction(int accountId, int id, [FromBody] TransactionDto transactionDto) {
 			var userId = User.GetUserId();
 			var accountFromDb = db.Accounts.FirstOrDefault(a => a.Id == accountId && a.UserId == userId);
-			if (accountFromDb != null) return NotFound("Account dose not exist");
+			if (accountFromDb == null) return NotFound("Account dose not exist");
 
 			var transactionFromDB = db.Transactions.Find(id);
 			if (transactionFromDB == null || transactionFromDB.AccountId != accountId) return NotFound("Transaction Not Found");
 
-			var isCategoryExist = db.Categories.Any(c => c.Id == transactionDto.CategoryId && (c.UserId == userId || c.UserId == null));
-			if (!isCategoryExist) return NotFound("Category dose not exist");
+			var categoryFromDb = db.Categories.FirstOrDefault(c => c.Id == transactionDto.CategoryId && (c.UserId == userId || c.UserId == null));
+			if (categoryFromDb == null) return NotFound("Category dose not exist");
+
+			decimal defAmount = transactionFromDB.Amount - transactionDto.Amount;
+
+			// Update account balance based on category type
+			if (categoryFromDb.Type == Core.Statics.CategoryType.Expense)
+				accountFromDb.Balance += defAmount;
+			else
+				accountFromDb.Balance -= defAmount;
 
 			transactionFromDB.Amount = transactionDto.Amount;
 			transactionFromDB.Note = transactionDto.Note;
-			transactionFromDB.CategoryId = transactionDto.CategoryId;
+			transactionFromDB.CategoryId = categoryFromDb.Id;
+
 
 			logger.LogInformation("transaction {} has been updated", id);
 			db.SaveChangesAsync();
@@ -94,10 +111,17 @@ namespace CoinKeep.Api.Controllers {
 		public IActionResult DeleteTransaction(int accountId, int id) {
 			var userId = User.GetUserId();
 			var accountFromDb = db.Accounts.FirstOrDefault(a => a.Id == accountId && a.UserId == userId);
-			if (accountFromDb != null) return NotFound("Account dose not exist");
+			if (accountFromDb == null) return NotFound("Account dose not exist");
 
-			var transactionFromDB = db.Transactions.Find(id);
+			var transactionFromDB = db.Transactions.Include(t => t.Category).FirstOrDefault(t => t.Id == id);
 			if (transactionFromDB == null || transactionFromDB.AccountId != accountId) return NotFound("Transaction Not Found");
+
+
+			if (transactionFromDB.Category.Type == CategoryType.Expense)
+				accountFromDb.Balance += transactionFromDB.Amount;
+			else
+				accountFromDb.Balance -= transactionFromDB.Amount;
+
 
 			db.Transactions.Remove(transactionFromDB);
 			logger.LogInformation("transaction {} has been deleted", id);
