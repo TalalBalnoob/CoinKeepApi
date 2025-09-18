@@ -1,4 +1,5 @@
 using CoinKeep.Api.Extensions;
+using CoinKeep.Core.DTOs;
 using CoinKeep.Core.Models;
 using CoinKeep.Infrastructure;
 
@@ -39,8 +40,8 @@ namespace CoinKeep.Api.Controllers {
 			});
 		}
 
-		[HttpPatch("{accountId}/balanceAdjustment")]
-		public IActionResult BalanceAdjustment(int accountId, [FromBody] decimal amount) {
+		[HttpPut("{accountId}/balanceAdjustment")]
+		public IActionResult BalanceAdjustment(int accountId, BalanceAdjustmentDto balanceDto) {
 			var userId = User.GetUserId();
 			var account = db.Accounts.FirstOrDefault(a => a.Id == accountId && a.UserId == userId);
 			if (account == null) return NotFound("Account dose not exist");
@@ -48,10 +49,10 @@ namespace CoinKeep.Api.Controllers {
 			var userFromDb = db.Users.Find(userId);
 			if (userFromDb == null) return NotFound();
 
-			account.Balance = amount;
+			account.Balance = balanceDto.Amount;
 
 			db.Transactions.Add(new Transaction {
-				Amount = amount - account.Balance,
+				Amount = balanceDto.Amount - account.Balance,
 				CategoryId = 1, // Balance Adjustment Category
 				Note = "Balance Adjustment",
 				Id = 0,
