@@ -20,9 +20,15 @@ namespace CoinKeep.Api.Controllers {
 			var userId = User.GetUserId();
 
 			var accountFromDb = db.Accounts.FirstOrDefault(a => a.Id == accountId && a.UserId == userId);
-			if (accountFromDb != null) return NotFound("Account dose not exist");
+			if (accountFromDb == null) return NotFound("Account dose not exist");
 
-			var transactions = db.Transactions.Where(u => u.AccountId == accountId).ToList();
+			List<ReturnedTransactionDTO>? transactions = db.Transactions.Where(u => u.AccountId == accountId).Select(u => new ReturnedTransactionDTO {
+				Id = u.Id,
+				Amount = u.Amount,
+				Note = u.Note,
+				CategoryId = u.CategoryId,
+				CreatedAt = u.CreatedAt
+			}).ToList();
 
 			return Ok(transactions);
 		}
@@ -32,9 +38,9 @@ namespace CoinKeep.Api.Controllers {
 			var userId = User.GetUserId();
 
 			var accountFromDb = db.Accounts.FirstOrDefault(a => a.Id == accountId && a.UserId == userId);
-			if (accountFromDb != null) return NotFound("Account dose not exist");
+			if (accountFromDb == null) return NotFound("Account dose not exist");
 
-			var transaction = db.Transactions.FirstOrDefault(u => u.Id == id);
+			Transaction? transaction = db.Transactions.FirstOrDefault(u => u.Id == id);
 
 			if (transaction == null || transaction.AccountId != accountId)
 				return NotFound();
@@ -43,7 +49,7 @@ namespace CoinKeep.Api.Controllers {
 		}
 
 		[HttpPost("{accountId}")]
-		public IActionResult CreateTransaction(int accountId, [FromBody] TransactionDto transactionDto) {
+		public IActionResult CreateTransaction(int accountId, [FromBody] NewTransactionDto transactionDto) {
 			var userId = User.GetUserId();
 
 			var accountFromDb = db.Accounts.FirstOrDefault(a => a.Id == accountId && a.UserId == userId);
@@ -78,7 +84,7 @@ namespace CoinKeep.Api.Controllers {
 
 
 		[HttpPut("{accountId}/{id}")]
-		public IActionResult UpdateTransaction(int accountId, int id, [FromBody] TransactionDto transactionDto) {
+		public IActionResult UpdateTransaction(int accountId, int id, [FromBody] NewTransactionDto transactionDto) {
 			var userId = User.GetUserId();
 			var accountFromDb = db.Accounts.FirstOrDefault(a => a.Id == accountId && a.UserId == userId);
 			if (accountFromDb == null) return NotFound("Account dose not exist");
