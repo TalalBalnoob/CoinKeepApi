@@ -19,8 +19,7 @@ namespace CoinKeep.Api.Controllers {
 			var accounts = db.Accounts.Where(a => a.UserId == userId).Select(a => new {
 				a.Id,
 				a.Name,
-				a.Balance,
-				a.CreatedAt
+				a.Balance
 			}).ToList();
 
 			return this.Ok(accounts);
@@ -49,8 +48,6 @@ namespace CoinKeep.Api.Controllers {
 			var userFromDb = db.Users.Find(userId);
 			if (userFromDb == null) return NotFound();
 
-			account.Balance = balanceDto.Amount;
-
 			db.Transactions.Add(new Transaction {
 				Amount = balanceDto.Amount - account.Balance,
 				CategoryId = 1, // Balance Adjustment Category
@@ -59,6 +56,8 @@ namespace CoinKeep.Api.Controllers {
 				AccountId = accountId,
 				CreatedAt = DateTime.UtcNow,
 			});
+
+			account.Balance = balanceDto.Amount;
 
 			db.Accounts.Update(account);
 			db.SaveChanges();
