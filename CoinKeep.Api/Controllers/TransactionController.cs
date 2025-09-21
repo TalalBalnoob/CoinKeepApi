@@ -33,6 +33,33 @@ namespace CoinKeep.Api.Controllers {
 			return Ok(transactions);
 		}
 
+		[HttpGet("{accountId}/recent")]
+		public IActionResult GetRecentTransactions(int accountId, [FromQuery] int limit = 10) {
+			var userId = User.GetUserId();
+
+			var accountFromDb = db.Accounts.FirstOrDefault(a => a.Id == accountId && a.UserId == userId);
+			if (accountFromDb == null) return NotFound("Account dose not exist");
+
+			if (limit < 0 || limit > 100) limit = 10;
+
+			List<ReturnedTransactionDTO>? transactions = db.Transactions
+															.Where(u => u.AccountId == accountId)
+															.Include(t => t.Category)
+															.OrderByDescending(t => t.CreatedAt)
+															.Take(limit)
+															.Select(u => new ReturnedTransactionDTO {
+																Id = u.Id,
+																Amount = u.Amount,
+																Note = u.Note,
+																CategoryId = u.CategoryId,
+																CategoryName = u.Category != null ? u.Category.Name : null,
+																transactionType = u.Category != null ? CategoryTypeExtensions.ToFriendlyString(u.Category.Type) : null,
+																CreatedAt = u.CreatedAt
+															}).ToList();
+
+			return Ok(transactions);
+		}
+
 		[HttpGet("{accountId}/{id}")]
 		public IActionResult GetTransaction(int accountId, int id) {
 			var userId = User.GetUserId();
