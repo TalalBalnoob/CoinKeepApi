@@ -10,6 +10,7 @@ using CoinKeep.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace CoinKeep.Api.Controllers;
@@ -19,15 +20,25 @@ namespace CoinKeep.Api.Controllers;
 public class UserController(AppDbContext db, IConfiguration config) : Controller {
 
 	[Authorize]
-	[HttpGet("getUsers")]
+	[HttpGet("profile")]
 	public IActionResult GetUser() {
-		var users = db.Users.Select(u => new UserProfileDto {
-			Id = u.Id,
-			Email = u.Email,
-			Username = u.Username
-		});
+		var userId = User.GetUserId();
 
-		return this.Ok(users);
+		var userFromDb = db.Users.Include(u => u.Account).FirstOrDefault(u => u.Id == userId);
+		if (userFromDb == null) return this.NotFound();
+
+		var userProfile = new UserProfileDto {
+			Id = userFromDb.Id,
+			Email = userFromDb.Email,
+			Username = userFromDb.Username,
+			Account = new ReturnedAccountDTO {
+				Id = userFromDb.Account?.Id ?? 0,
+				Name = userFromDb.Account?.Name ?? string.Empty,
+				Balance = userFromDb.Account?.Balance ?? 0,
+			}
+		};
+
+		return this.Ok(userProfile);
 	}
 
 	[HttpPost("register")]
@@ -90,7 +101,7 @@ public class UserController(AppDbContext db, IConfiguration config) : Controller
 			issuer: config["Jwt:Issuer"],
 			audience: config["Jwt:Audience"],
 			claims: claims,
-			expires: DateTime.UtcNow.AddHours(8),
+			expires: DateTime.UtcNow.AddDays(100),
 			signingCredentials: creds
 		);
 
